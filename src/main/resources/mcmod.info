@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "chlorine",
+    "name": "Chlorine",
+    "description": "Chlorine is a 1.8.9 mod which adds support for more archive types!",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "ChachyDev"
+    ],
+    "credits": "luna! for the random idea. :)",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]

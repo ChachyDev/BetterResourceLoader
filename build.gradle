@@ -1,0 +1,111 @@
+buildscript {
+    repositories {
+        maven {
+            name = "forge"
+            url = "https://maven.minecraftforge.net"
+        }
+
+        maven {
+            name = "jitpack"
+            url = "https://jitpack.io/"
+        }
+    }
+    dependencies {
+        classpath "com.github.asbyth:ForgeGradle:86b2392"
+        classpath "com.github.Skytils:mixingradle:d75e32e743"
+    }
+}
+apply plugin: "net.minecraftforge.gradle.forge"
+apply plugin: "org.spongepowered.mixin"
+
+version = "0.0.2"
+group = "club.chachy"
+archivesBaseName = "chlorine-forge"
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+minecraft {
+    version = "1.8.9-11.15.1.2318-1.8.9"
+    runDir = "run"
+
+    mappings = "stable_22"
+    makeObfSourceJar = false
+    clientJvmArgs += "-Dfml.coreMods.load=club.chachy.chlorine.tweaker.FMLLoadingPlugin"
+    clientRunArgs += "--mixin mixin.chlorine.json"
+}
+
+configurations {
+    include
+    implementation.extendsFrom(include)
+}
+
+repositories {
+    maven { url "https://jitpack.io" }
+    maven { url "https://repo.spongepowered.org/maven" }
+    mavenCentral()
+}
+
+dependencies {
+    include("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
+        exclude module: 'guava'
+        exclude module: 'commons-io'
+        exclude module: 'gson'
+    }
+
+    annotationProcessor("org.spongepowered:mixin:0.7.11-SNAPSHOT")
+}
+
+mixin {
+    disableRefMapWarning = true
+    defaultObfuscationEnv searge
+    add sourceSets.main, "mixin.chlorine.refmap.json"
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.include.collect { file -> file.isDirectory() ? file : zipTree(file) }
+    }
+
+    manifest.attributes(
+        "FMLCorePlugin": "club.chachy.chlorine.tweaker.ChlorinePlugin",
+        "FMLCorePluginContainsFMLMod": true,
+        "ForceLoadAsMod": true,
+        "MixinConfigs": "mixin.chlorine.json",
+        "ModSide": "CLIENT",
+        "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
+        "TweakOrder": "0",
+    )
+}
+
+reobf {
+    jar {
+        classpath = sourceSets.main.compileClasspath
+        mappingType = "SEARGE"
+    }
+}
+
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include "mcmod.info"
+
+        // replace version and mcversion
+        expand "version": project.version, "mcversion": project.minecraft.version
+    }
+
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "mcmod.info"
+    }
+}

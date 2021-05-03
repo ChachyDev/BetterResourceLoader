@@ -1,0 +1,11 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "package": "club.chachy.chlorine.mixin",
+  "refmap": "mixin.chlorine.refmap.json",
+  "minVersion": "0.7.11",
+  "mixins": [
+    "client.resources.MixinEntry",
+    "client.resources.MixinResourcePackRepositoryFileFilter"
+  ],
+  "verbose": true
+}
